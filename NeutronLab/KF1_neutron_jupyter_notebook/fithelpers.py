@@ -68,8 +68,8 @@ def fit_gaussian_at_pos(x, y, pos, npoints=10):
     return g
 
 def fit_all_gaussians(x, y, npoints=10, widths = np.arange(10,80,5), loglevel="WARNING"):
-    """ fits all gaussians in a spectrum measurement and returns a list of coefficients. 
-    The range of widths considered for fit is given by an array (e.g. 'np.arange(X1,X2,X3)': 
+    """ fits all gaussians in a spectrum measurement and returns a list of coefficients.
+    The range of widths considered for fit is given by an array (e.g. 'np.arange(X1,X2,X3)':
     range from X1 to X2 in steps of X3)."""
     logging.basicConfig()
     log = logging.getLogger('fit_all_gaussians_in_spectrum') ## set up logging
@@ -78,7 +78,7 @@ def fit_all_gaussians(x, y, npoints=10, widths = np.arange(10,80,5), loglevel="W
     gaussians = []
 
     ## find peaks in y with range of widths given by an array (range from X1 to X2 in steps of X3)
-    peakind = signal.find_peaks_cwt(y, widths) 
+    peakind = signal.find_peaks_cwt(y, widths)
     log.info("Found {} peak(s) in the data, fitting them with gaussians:".format(len(peakind)))
     for p in peakind:
         g = fit_gaussian_at_idx(x, y, p, npoints=npoints)
