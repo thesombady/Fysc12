@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
 class Gaussian:
     """Parametric representation of the Gaussian fit."""
@@ -27,51 +28,29 @@ def Gaussianfit(xlist, ylist):
     if len(xlist) < 4 and len(xlist) == len(ylist):
         raise KeyError("[GaussianFit] Can't make Gaussianfit due to too few values given")
     else:
-        gaussian2 = lambda A, x, mu, sigma: A * math.exp(- (x - mu) **2/(2*sigma ** 2) ** 2)
-        #mu => center of peak
-        #sigma => width
-        #A => amplitude
-        Converty = lambda y: np.ln(y)
-        ConvertRhs = lambda A, x, mu, sigma: np.ln(A) - mu**2/(2*sigma**2) + 2 * mu * sigma/(2*sigma**2) - x**2/(2*sigma**2)
-        #ln(y) = a + bx + cx^2
-        a = lambda A, mu, sigma: np.ln(A) - mu ** 2/(2 * sigma**2)
-        b = lambda mu, sigma: mu / (sigma**2)
-        c = lambda sigma: - 1 /(2 * sigma**2)
-
         Error = lambda y, A, x, mu, sigma: np.ln(y) - (np.ln(A) - mu**2/(2*sigma**2) + 2 * mu * sigma/(2*sigma**2) - x**2/(2*sigma**2))
 
         Constant_a = np.ones(len(xlist))
         line1 = np.ones(len(xlist))
-        MatrixA = np.array([np.ones(len(xlist)), xlist, xlist ** 2])
+        MatrixA = np.array([np.ones(len(xlist)), xlist, xlist ** 2]).T
         MatrixAT = MatrixA.T
-        print(MatrixAT.dot(MatrixA))
-        print(np.linalg.det(MatrixAT.dot(MatrixA)))
-
         try:
             InverseA = np.linalg.inv(MatrixAT.dot(MatrixA))
-            print(InverseA)
+            ylist2 = np.log(ylist)
+            ylist3 = MatrixAT.dot(ylist2)
+            Constants = InverseA.dot(ylist3)
         except Exception as E:
             raise E
+        sigma = np.log(- 1 / (2 * Constants[2]))
+        mu = Constants[1] * sigma ** 2
+        A = np.exp(Constants[0] + mu ** 2 / (2 * sigma ** 2))
+        print(A, mu, sigma)
 
+        return np.array([A, mu, sigma])
 
-        """
-        line1 = np.ones(len(xlist))
-        A = np.array([xlist, line1]).T
-        ATA = A.T.dot(A)
-        ATY = A.T.dot(ylist)
-        ATAInv = np.linalg.inv(ATA)
-        KX = ATAInv.dot(ATY)
-        if KX[0] == 0 or KX[1] == 0:
-            raise KeyError("[Gaussianfit] Can't make an accurate fit")
-        print(KX)
-        def Gaussian3(modx, mody):
-            if not isinstance((modx, mody), (np.generic, np.ndarray)):
-                raise TypeError("[GaussianFit] Can't make Gaussianfit.")
-            else:
-        """
-
-        #return np.array([gaussian2(1,1,1,1)])
 
 xlist1 = np.array([1,2,3,4,5,6,8,9,10])
-ylist1 = np.array([2,3,4,7,7,6,5,5,3])
-print(Gaussianfit(xlist1, ylist1))
+ylist1 = np.array([2,3,4,7,8,6,5,4,3])
+Fitted = Gaussianfit(xlist1, ylist1)
+plt.plot(xlist1, ylist1, '.', label = "tested values")
+#plt.show()
