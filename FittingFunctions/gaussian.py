@@ -27,10 +27,34 @@ def Gaussianfit(xlist, ylist):
     if len(xlist) < 4 and len(xlist) == len(ylist):
         raise KeyError("[GaussianFit] Can't make Gaussianfit due to too few values given")
     else:
-        gaussian2 = lambda A, x, mu, sigma: A * math.exp(- (x - mu)/(sigma) ** 2)
-        Converty = lambda y, A :np.ln(y/A)
-        ConvertRHS = lambda x, my, sigma : - x / sigma ** 2 + mu / sigma ** 2
-        #ln(y/A) = -x/sigma^2 + my/sigma^2
+        gaussian2 = lambda A, x, mu, sigma: A * math.exp(- (x - mu) **2/(2*sigma ** 2) ** 2)
+        #mu => center of peak
+        #sigma => width
+        #A => amplitude
+        Converty = lambda y: np.ln(y)
+        ConvertRhs = lambda A, x, mu, sigma: np.ln(A) - mu**2/(2*sigma**2) + 2 * mu * sigma/(2*sigma**2) - x**2/(2*sigma**2)
+        #ln(y) = a + bx + cx^2
+        a = lambda A, mu, sigma: np.ln(A) - mu ** 2/(2 * sigma**2)
+        b = lambda mu, sigma: mu / (sigma**2)
+        c = lambda sigma: - 1 /(2 * sigma**2)
+
+        Error = lambda y, A, x, mu, sigma: np.ln(y) - (np.ln(A) - mu**2/(2*sigma**2) + 2 * mu * sigma/(2*sigma**2) - x**2/(2*sigma**2))
+
+        Constant_a = np.ones(len(xlist))
+        line1 = np.ones(len(xlist))
+        MatrixA = np.array([np.ones(len(xlist)), xlist, xlist ** 2])
+        MatrixAT = MatrixA.T
+        print(MatrixAT.dot(MatrixA))
+        print(np.linalg.det(MatrixAT.dot(MatrixA)))
+
+        try:
+            InverseA = np.linalg.inv(MatrixAT.dot(MatrixA))
+            print(InverseA)
+        except Exception as E:
+            raise E
+
+
+        """
         line1 = np.ones(len(xlist))
         A = np.array([xlist, line1]).T
         ATA = A.T.dot(A)
@@ -43,9 +67,11 @@ def Gaussianfit(xlist, ylist):
         def Gaussian3(modx, mody):
             if not isinstance((modx, mody), (np.generic, np.ndarray)):
                 raise TypeError("[GaussianFit] Can't make Gaussianfit.")
+            else:
+        """
 
-        return np.array([gaussian2(1,1,1,1)])
+        #return np.array([gaussian2(1,1,1,1)])
 
-xlist1 = np.array([1,2,3,4,5])
-ylist1 = np.array([2,3,4,4,2])
+xlist1 = np.array([1,2,3,4,5,6,8,9,10])
+ylist1 = np.array([2,3,4,7,7,6,5,5,3])
 print(Gaussianfit(xlist1, ylist1))
