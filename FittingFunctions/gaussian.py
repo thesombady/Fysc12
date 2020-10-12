@@ -41,10 +41,11 @@ def Gaussianfit(xlist, ylist):
             Constants = InverseA.dot(ylist3)
         except Exception as E:
             raise E
-        sigma = np.log(- 1 / (2 * Constants[2]))
+        sigma = np.sqrt(- 1 / (2 * Constants[2]))
         mu = Constants[1] * sigma ** 2
         A = np.exp(Constants[0] + mu ** 2 / (2 * sigma ** 2))
         print(A, mu, sigma)
+        print(Constants[0])
 
         return np.array([A, mu, sigma])
 
