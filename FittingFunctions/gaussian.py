@@ -46,12 +46,71 @@ def Gaussianfit(xlist, ylist):
         A = np.exp(Constants[0] + mu ** 2 / (2 * sigma ** 2))
         print(A, mu, sigma)
         print(Constants[0])
+        function = lambda x: A * np.exp(-(x-mu)**2/(2*sigma**2))
+        return function
+        #return np.array([A, mu, sigma])
 
-        return np.array([A, mu, sigma])
+class GaussianFit:
+    def __init__(self, xlist, ylist):
+        self.xlist = xlist
+        self.ylist = ylist
+
+    def ComputeGausian(self, index1, index2):
+        """Returns a function of which one can plot the gausian fit with."""
+        try:
+            xlist1 = np.array(self.xlist[index1:index2])
+            ylist0 = self.ylist[index1:index2]
+            ylist1 = np.array([[arg] for arg in ylist0])
+        except Exception as E:
+            raise E
+        if len(xlist1) < 4:
+            raise KeyError("[GaussianFit]: Needs more data to performe gaussian fit.")
+        else:
+            Constant_a = np.ones(len(xlist1))
+            line1 = np.ones(len(xlist1))
+            MatrixA = np.array([np.ones(len(xlist1)), xlist1, xlist1 ** 2]).T
+            MatrixAT = MatrixA.T
+            try:
+                InverseA = np.linalg.inv(MatrixAT.dot(MatrixA))
+                ylist2 = np.log(ylist1)
+                ylist3 = MatrixAT.dot(ylist2)
+                Constants = InverseA.dot(ylist3)
+            except Exception as E:
+                raise E
+            sigma = np.sqrt(- 1 / (2 * Constants[2]))
+            mu = Constants[1] * sigma ** 2
+            A = np.exp(Constants[0] + mu ** 2 / (2 * sigma ** 2))
+            print(A, mu, sigma)
+            print(Constants[0])
+            function = lambda x: A * np.exp(-(x-mu)**2/(2*sigma**2))
+            self.PlotFit(function, xlist1)
+            return function, xlist1
+
+    def PlotData(self):
+        plt.plot(self.xlist, self.ylist, '.')
+        plt.show()
+
+    def PlotFit(self, function, xlist, res = 1000):
+        if not callable(function):
+            raise KeyError("[GaussianFit]: Cannot plot the gaussian fit")
+        else:
+            plt.plot(self.xlist, self.ylist, '.')
+            xranges = np.linspace(xlist[0], xlist[-1], res)
+            yvalues = list(map(function, xranges))
+            plt.plot(xranges, yvalues)
+            plt.title("Gausian fit")
+            plt.show()
+
 
 
 xlist1 = np.array([1,2,3,4,5,6,8,9,10])
 ylist1 = np.array([2,3,4,7,8,6,5,4,3])
+listx2 = np.linspace(-1, 15, 100)
 Fitted = Gaussianfit(xlist1, ylist1)
+fittedx = list(map(Fitted, listx2))
+Data = GaussianFit(xlist1, ylist1)
+data = Data.ComputeGausian(0, 9)
+print(data)
 plt.plot(xlist1, ylist1, '.', label = "tested values")
+plt.plot(listx2, fittedx)
 #plt.show()
