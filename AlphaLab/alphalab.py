@@ -93,3 +93,7 @@ Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
 AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
 
 #2388.66114752
+#Every intersection goes towards the same point.
+#Being the one listen above.
+CalibrationConstant = 5485.56 #keV
+EnergyConvertion = lambda x: CalibrationConstant / x
