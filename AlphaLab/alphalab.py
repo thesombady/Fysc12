@@ -74,7 +74,22 @@ def load_spectrum(filename):
         return None
     return m.bin_centers, m.counts
 
-xlist, ylist = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
-plt.plot(xlist,ylist, '.')
-plt.xlim(2200,2600)
-plt.show()
+Amaricum80V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
+Amercium90V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium90V.Spe')
+Amercium100V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V.Spe')
+#80V
+
+Amercium80V1 = GaussianFit(Amaricum80V[0], Amaricum80V[1])
+AmerciumValues80V = Amercium80V1.ComputeGaussian(2373, 2404)
+
+#90V
+
+Amercium90V1 = GaussianFit(Amercium90V[0], Amercium90V[1])
+AmerciumValues90V = Amercium90V1.ComputeGaussian(2375, 2407)
+
+#100V
+
+Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
+AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
+
+#2388.66114752
