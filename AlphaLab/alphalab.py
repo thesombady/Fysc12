@@ -7,18 +7,23 @@ import logging                           ## for orderly print output
 import sys                               ## useful system calls (used to exit cleanly)
 import os                                ## path manipulations
 
-def ImportFunction(Path):
+def ImportFunction(Path1, Path2):
     try:
-        DataFrame = pd.read_csv(Path)
-        DataFrame = DataFrame[0:-1]
+        DataFrame1 = pd.read_csv(Path1)
+        #DataFrame1 = DataFrame1[0:-1]
+        DataFrame2 = pd.read_csv(Path2)
     except Exception as E:
         raise E
-    for index, row in DataFrame.iterrows():
-        print(str(row))
-
+    """
+    for index, row, in DataFrame2.iterrows():
         print(index)
+    """
+    print(DataFrame2)
+    """
+    for index, row in DataFrame1.iterrows():
+        print(index)
+    """
+    return DataFrame1, DataFrame2
 
-    return DataFrame
 
-
-Value = ImportFunction('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
+Value = ImportFunction('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe', '/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.csv')
