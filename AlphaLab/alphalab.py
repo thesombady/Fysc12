@@ -6,6 +6,10 @@ import csv                               ## for reading in our data files
 import logging                           ## for orderly print output
 import sys                               ## useful system calls (used to exit cleanly)
 import os                                ## path manipulations
+from scipy import optimize
+from scipy.integrate import quad
+from scipy.optimize import fsolve
+import scipy
 
 class Spectrum:
     """A class to hold our spectrum measurement data and meta data (such as duration)"""
@@ -73,27 +77,117 @@ def load_spectrum(filename):
         log.error("Could not find the file '"+str(filename)+"'")
         return None
     return m.bin_centers, m.counts
-
+"""
 Amaricum80V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
 Amercium90V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium90V.Spe')
 Amercium100V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V.Spe')
 #80V
-
 Amercium80V1 = GaussianFit(Amaricum80V[0], Amaricum80V[1])
 AmerciumValues80V = Amercium80V1.ComputeGaussian(2373, 2404)
-
+ErrorAmercium80V = AmerciumValues80V[-1]
 #90V
-
 Amercium90V1 = GaussianFit(Amercium90V[0], Amercium90V[1])
 AmerciumValues90V = Amercium90V1.ComputeGaussian(2375, 2407)
-
+ErrorAmercium90V = AmerciumValues90V[-1]
 #100V
-
 Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
 AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
-
+ErrorAmercium100V = AmerciumValues100V[-1]
+"""
 #2388.66114752
 #Every intersection goes towards the same point.
 #Being the one listen above.
 CalibrationConstant = 5485.56 #keV
-EnergyConvertion = lambda x: CalibrationConstant / x
+Center = 2388.66114752
+EnergyConvertion = lambda x: CalibrationConstant / Center * x
+k = CalibrationConstant / Center
+"""
+Calibration done
+"""
+Amaricium100V1cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V1cm.Spe')
+Amaricium100V2cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V2cm.Spe')
+Amaricium100V2_5cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V2_5cm.Spe')
+Amaricium100V3cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V3cm.Spe')
+#Import done
+Americum100V1cm1 = GaussianFit(Amaricium100V1cm[0], Amaricium100V1cm[1])
+Americum100V1cm1.Calibration(EnergyConvertion, k)
+Error1 = Americum100V1cm1.ComputeGaussian(1696, 1861)
+Alphapeak1 = Americum100V1cm1.CalibratedPeaks()
+#Americum100V1cm1.PlotData()
+Amaricium100V2cm1 = GaussianFit(Amaricium100V2cm[0], Amaricium100V2cm[1])
+Amaricium100V2cm1.Calibration(EnergyConvertion, k)
+Error2 = Amaricium100V2cm1.ComputeGaussian(1214, 1380)
+Alphapeak2 = Amaricium100V2cm1.CalibratedPeaks()
+#Amaricium100V2cm1.PlotData()
+Amaricium100V2_5cm1 = GaussianFit(Amaricium100V2_5cm[0], Amaricium100V2_5cm[1])
+Amaricium100V2_5cm1.Calibration(EnergyConvertion, k)
+Error3 = Amaricium100V2_5cm1.ComputeGaussian(930, 1100)
+Alphapeak3 = Amaricium100V2_5cm1.CalibratedPeaks()
+#Amaricium100V2_5cm1.PlotData()
+Amaricium100V3cm1 = GaussianFit(Amaricium100V3cm[0], Amaricium100V3cm[1])
+Amaricium100V3cm1.Calibration(EnergyConvertion, k)
+Error4 = Amaricium100V3cm1.ComputeGaussian(625, 795)
+Alphapeak4 = Amaricium100V3cm1.CalibratedPeaks()
+#Amaricium100V3cm1.PlotData()
+
+"""
+Bethe-Bloch task
+"""
+R = [1.05, 1.97, 2.45, 2.93] #cm
+Ei = 5.48556 #MeV
+
+
+
+def Bethe(E_k):
+    Electronpart = 0.307075 #MeVcm^2/g
+    z = 2
+    electronmass = 0.511 #MeVcm
+    Z = 14.46
+    A = 28.96 #g/mol
+    rho = 1.225*10**(-3)# g/cm3
+    I = 8.6 * 10 ** (-5)#MeV
+    alphamass = 3727 #MeV
+    Beta2 = 1 - 1/(1 + E_k/alphamass)**2
+    Na = 6.022 * 10 ** (23)
+    return (Electronpart/Beta2 * Z * z ** 2 * rho / A  * (np.log((2*electronmass*Beta2)/(I*(1-Beta2)))-Beta2)) ** (-1)
+
+def func1(E,r):
+    solved = quad(Bethe, E, Ei)
+    return solved[0] - r
+
+vfunc1 = scipy.vectorize(func1)
+EnergyValues = np.array([fsolve(vfunc1, 0.5, args=(r)) for r in R]) * 10 ** (3) #Convert from Mev to keV
+MeasuredValues = np.array([Alphapeak1[0], Alphapeak2[0], Alphapeak3[0], Alphapeak4[0]])
+print(EnergyValues)
+print(MeasuredValues)
+ErrorValues = [Error1[-1], Error2[-1], Error3[-1], Error4[-1]]
+print(ErrorValues)
+
+plt.plot(R, EnergyValues, '.', label = "Theoretical values")
+plt.plot(R, MeasuredValues, '+', label = "Measured Values")
+plt.title("Bethe-Bloch")
+plt.xlabel('Distance [cm]')
+plt.ylabel("Energy [keV]")
+plt.legend()
+plt.show()
+
+#Calibration done for the newly imported files
+#Now we tend to fit
+Thorium1 = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Thorium.Spe')
+Thorium = GaussianFit(Thorium1[0], Thorium1[1])
+#Thorium.Calibration(EnergyConvertion)
+#Thorium.PlotData('Thorium spectrum', 'Energy [keV]', 'Counts', 'Aquired Data')
+"""
+Thoriumpeak1 = Thorium.ComputeGaussian(2308, 2338)
+Thoriumpeak2 = Thorium.ComputeGaussian(2345, 2379)
+Thoriumpeak3 = Thorium.ComputeGaussian(2457, 2495)
+Thoriumpeak4 = Thorium.ComputeGaussian(2605, 2675)
+Thoriumpeak5 = Thorium.ComputeGaussian(2720, 2760)
+Thoriumpeak6 = Thorium.ComputeGaussian(2938, 2975)
+Thoriumpeak7 = Thorium.ComputeGaussian(3818, 3850)
+Thorium.Calibration(EnergyConvertion, CalibrationConstant / Center)
+print(Thorium.CalibratedPeaks())
+"""
+"""
+All peaks are found and the values are stored in the variable, since it's a tuple. Multiply this by the conversion, being k.
+"""
