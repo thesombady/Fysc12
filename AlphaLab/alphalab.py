@@ -77,7 +77,7 @@ def load_spectrum(filename):
         log.error("Could not find the file '"+str(filename)+"'")
         return None
     return m.bin_centers, m.counts
-"""
+
 Amaricum80V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
 Amercium90V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium90V.Spe')
 Amercium100V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V.Spe')
@@ -93,10 +93,7 @@ ErrorAmercium90V = AmerciumValues90V[-1]
 Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
 AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
 ErrorAmercium100V = AmerciumValues100V[-1]
-"""
-#2388.66114752
-#Every intersection goes towards the same point.
-#Being the one listen above.
+
 CalibrationConstant = 5485.56 #keV
 Center = 2387.32
 EnergyConvertion = lambda x: CalibrationConstant / Center * x
@@ -116,28 +113,28 @@ Error1 = Americum100V1cm1.ComputeGaussian(1696, 1861)
 print(Americum100V1cm1.Area, Americum100V1cm1.Mu, Americum100V1cm1.Sigma)
 print(Americum100V1cm1.Sigma/np.sqrt(Americum100V1cm1.Area))
 Alphapeak1 = Americum100V1cm1.CalibratedPeaks()
-#Americum100V1cm1.PlotData()
+
 Amaricium100V2cm1 = GaussianFit(Amaricium100V2cm[0], Amaricium100V2cm[1])
 Amaricium100V2cm1.Calibration(EnergyConvertion, k)
 Error2 = Amaricium100V2cm1.ComputeGaussian(1214, 1380)
 print(Amaricium100V2cm1.Area, Amaricium100V2cm1.Mu, Amaricium100V2cm1.Sigma)
 print(Amaricium100V2cm1.Sigma/np.sqrt(Amaricium100V2cm1.Area))
 Alphapeak2 = Amaricium100V2cm1.CalibratedPeaks()
-#Amaricium100V2cm1.PlotData()
+
 Amaricium100V2_5cm1 = GaussianFit(Amaricium100V2_5cm[0], Amaricium100V2_5cm[1])
 Amaricium100V2_5cm1.Calibration(EnergyConvertion, k)
 Error3 = Amaricium100V2_5cm1.ComputeGaussian(930, 1100)
 print(Amaricium100V2_5cm1.Area, Amaricium100V2_5cm1.Mu, Amaricium100V2_5cm1.Sigma)
 print(Amaricium100V2_5cm1.Sigma/np.sqrt(Amaricium100V2_5cm1.Area))
 Alphapeak3 = Amaricium100V2_5cm1.CalibratedPeaks()
-#Amaricium100V2_5cm1.PlotData()
+
 Amaricium100V3cm1 = GaussianFit(Amaricium100V3cm[0], Amaricium100V3cm[1])
 Amaricium100V3cm1.Calibration(EnergyConvertion, k)
 Error4 = Amaricium100V3cm1.ComputeGaussian(625, 795)
 print(Amaricium100V3cm1.Area, Amaricium100V3cm1.Mu, Amaricium100V3cm1.Sigma)
 print(Amaricium100V3cm1.Sigma / np.sqrt(Amaricium100V3cm1.Area))
 Alphapeak4 = Amaricium100V3cm1.CalibratedPeaks()
-#Amaricium100V3cm1.PlotData()
+
 print('Above is task 3')
 
 """
@@ -246,8 +243,13 @@ Thoriumpeak7 = Thorium.ComputeGaussian(3818, 3850)
 print(Thorium.PeakValues)
 print(Thorium.Area)
 print(Thorium.Sigma)
-Thorium.PlotData("Thorium Spectrum", "Energy [keV]", "Counts")
+Thorium.PlotData("Thorium Spectrum", "Energy [keV]", "Counts", xlim = 10000)
 Sigmavalues = np.array(Thorium.Sigma)
 FWHM = 2 * np.sqrt(2 * np.log(2)) * Sigmavalues
 print(FWHM)
 print(Sigmavalues/np.sqrt(Thorium.Area))
+try:
+    print('B4', Thorium.Area[3]/(Thorium.Area[3] + Thorium.Area[6]))
+    print('B7', Thorium.Area[6]/(Thorium.Area[3] + Thorium.Area[6]))
+except Exception as E:
+    raise E
