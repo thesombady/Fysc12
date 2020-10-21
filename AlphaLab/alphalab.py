@@ -77,7 +77,7 @@ def load_spectrum(filename):
         log.error("Could not find the file '"+str(filename)+"'")
         return None
     return m.bin_centers, m.counts
-"""
+
 Amaricum80V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
 Amercium90V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium90V.Spe')
 Amercium100V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V.Spe')
@@ -93,17 +93,18 @@ ErrorAmercium90V = AmerciumValues90V[-1]
 Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
 AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
 ErrorAmercium100V = AmerciumValues100V[-1]
-"""
+
 #2388.66114752
 #Every intersection goes towards the same point.
 #Being the one listen above.
 CalibrationConstant = 5485.56 #keV
-Center = 2388.66114752
+Center = 2387.32
 EnergyConvertion = lambda x: CalibrationConstant / Center * x
 k = CalibrationConstant / Center
 """
 Calibration done
 """
+
 Amaricium100V1cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V1cm.Spe')
 Amaricium100V2cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V2cm.Spe')
 Amaricium100V2_5cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V2_5cm.Spe')
@@ -129,12 +130,14 @@ Amaricium100V3cm1.Calibration(EnergyConvertion, k)
 Error4 = Amaricium100V3cm1.ComputeGaussian(625, 795)
 Alphapeak4 = Amaricium100V3cm1.CalibratedPeaks()
 #Amaricium100V3cm1.PlotData()
+
 """
 Calibration curve
 """
+
 #plt.plot(Amaricium100V3cm[0], 'b')
 plt.plot(Amaricium100V3cm[0], np.array(Amaricium100V3cm[0]) *k,'g', label = "Calibration curve")
-plt.xlabel("Count")
+plt.xlabel("Channel")
 plt.ylabel("Energy [keV]")
 plt.title("Calibration of instruments")
 plt.legend()
@@ -145,7 +148,6 @@ Bethe-Bloch task
 """
 R = [1.05, 1.97, 2.45, 2.93] #cm
 Ei = 5.48556 #MeV
-
 
 
 def Bethe(E_k):
@@ -182,7 +184,7 @@ plt.ylabel("Energy [keV]")
 plt.legend()
 plt.show()
 
-"""
+
 NewMeasuredValues = np.array([Americum100V1cm1.Counts[0]/200.18, Amaricium100V2cm1.Counts[0]/199.88,
     Amaricium100V2_5cm1.Counts[0]/199.66,
     Amaricium100V3cm1.Counts[0]/200.08])
@@ -196,7 +198,8 @@ plt.ylabel("Counts per seconds")
 plt.xlabel("Energy [keV]")
 plt.legend()
 plt.show()
-"""
+
+
 newAmericum100V1cm = np.array(Amaricium100V1cm[1]) / 200.18
 xaxis1 = np.array(Amaricium100V1cm[0]) * k
 newAmericum100V2cm = np.array(Amaricium100V2cm[1]) / 199.88
@@ -215,16 +218,11 @@ plt.xlabel("Energy [keV]")
 plt.ylabel("Counts per second")
 plt.legend()
 plt.show()
-
-
 #Calibration done for the newly imported files
 #Now we tend to fit
 Thorium1 = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Thorium.Spe')
 Thorium = GaussianFit(Thorium1[0], Thorium1[1])
-
-#Thorium.Calibration(EnergyConvertion)
-#Thorium.PlotData('Thorium spectrum', 'Energy [keV]', 'Counts', 'Aquired Data')
-
+Thorium.Calibration(EnergyConvertion, CalibrationConstant / Center)
 Thoriumpeak1 = Thorium.ComputeGaussian(2308, 2338)
 Thoriumpeak2 = Thorium.ComputeGaussian(2345, 2379)
 Thoriumpeak3 = Thorium.ComputeGaussian(2457, 2495)
@@ -232,6 +230,12 @@ Thoriumpeak4 = Thorium.ComputeGaussian(2605, 2675)
 Thoriumpeak5 = Thorium.ComputeGaussian(2720, 2760)
 Thoriumpeak6 = Thorium.ComputeGaussian(2938, 2975)
 Thoriumpeak7 = Thorium.ComputeGaussian(3818, 3850)
-Thorium.Calibration(EnergyConvertion, CalibrationConstant / Center)
-print(Thorium.CalibratedPeaks())
+
+print(Thorium.PeakValues)
+print(Thorium.Area)
+print(Thorium.Sigma)
 Thorium.PlotData("Thorium Spectrum", "Energy [keV]", "Counts")
+Sigmavalues = np.array(Thorium.Sigma)
+FWHM = 2 * np.sqrt(2 * np.log(2)) * Sigmavalues
+print(FWHM)
+print(Sigmavalues/np.sqrt(Thorium.Area))
