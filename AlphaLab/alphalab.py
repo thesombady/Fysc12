@@ -129,6 +129,16 @@ Amaricium100V3cm1.Calibration(EnergyConvertion, k)
 Error4 = Amaricium100V3cm1.ComputeGaussian(625, 795)
 Alphapeak4 = Amaricium100V3cm1.CalibratedPeaks()
 #Amaricium100V3cm1.PlotData()
+"""
+Calibration curve
+"""
+#plt.plot(Amaricium100V3cm[0], 'b')
+plt.plot(Amaricium100V3cm[0], np.array(Amaricium100V3cm[0]) *k,'g', label = "Calibration curve")
+plt.xlabel("Count")
+plt.ylabel("Energy [keV]")
+plt.title("Calibration of instruments")
+plt.legend()
+plt.show()
 
 """
 Bethe-Bloch task
@@ -160,24 +170,61 @@ EnergyValues = np.array([fsolve(vfunc1, 0.5, args=(r)) for r in R]) * 10 ** (3) 
 MeasuredValues = np.array([Alphapeak1[0], Alphapeak2[0], Alphapeak3[0], Alphapeak4[0]])
 print(EnergyValues)
 print(MeasuredValues)
-ErrorValues = [Error1[-1], Error2[-1], Error3[-1], Error4[-1]]
+ErrorValues = np.array([Error1[1], Error2[1], Error3[1], Error4[1]])
 print(ErrorValues)
 
 plt.plot(R, EnergyValues, '.', label = "Theoretical values")
-plt.plot(R, MeasuredValues, '+', label = "Measured Values")
-plt.title("Bethe-Bloch")
+plt.plot(R, MeasuredValues, '+')
+plt.errorbar(R, MeasuredValues, yerr = ErrorValues, xerr = 0.05, linestyle = "None", label = 'Measured values')
+plt.title("Bethe & Bloch")
 plt.xlabel('Distance [cm]')
 plt.ylabel("Energy [keV]")
 plt.legend()
 plt.show()
 
+"""
+NewMeasuredValues = np.array([Americum100V1cm1.Counts[0]/200.18, Amaricium100V2cm1.Counts[0]/199.88,
+    Amaricium100V2_5cm1.Counts[0]/199.66,
+    Amaricium100V3cm1.Counts[0]/200.08])
+
+Xlist = [Americum100V1cm1.Calibratedp()[0], Amaricium100V2cm1.Calibratedp()[0], Amaricium100V2_5cm1.Calibratedp()[0], Amaricium100V3cm1.Calibratedp()[0]]#Energy
+
+
+plt.plot(Xlist, NewMeasuredValues, '.', label = "Data aquired")
+plt.title("Counts per seconds versus energy")
+plt.ylabel("Counts per seconds")
+plt.xlabel("Energy [keV]")
+plt.legend()
+plt.show()
+"""
+newAmericum100V1cm = np.array(Amaricium100V1cm[1]) / 200.18
+xaxis1 = np.array(Amaricium100V1cm[0]) * k
+newAmericum100V2cm = np.array(Amaricium100V2cm[1]) / 199.88
+xaxis2 = np.array(Amaricium100V2cm[0]) * k
+newAmericum100V2_5cm = np.array(Amaricium100V2_5cm[1]) / 199.66
+xaxis3 = np.array(Amaricium100V2_5cm[0]) * k
+newAmericum100V3cm = np.array(Amaricium100V3cm[1]) / 200.08
+xaxis4 = np.array(Amaricium100V3cm[0]) * k
+
+plt.plot(xaxis1, newAmericum100V1cm, '.', color = 'b', label = "1cm Spectrum")
+plt.plot(xaxis2, newAmericum100V2cm, '.', color = 'r', label = "2cm Spectrum")
+plt.plot(xaxis3, newAmericum100V2_5cm, '.', color = 'g', label = "2.5cm Spectrum")
+plt.plot(xaxis4, newAmericum100V3cm, '.', color = 'black', label = "3cm Spectrum")
+plt.title("Varying distance spectrum")
+plt.xlabel("Energy [keV]")
+plt.ylabel("Counts per second")
+plt.legend()
+plt.show()
+
+
 #Calibration done for the newly imported files
 #Now we tend to fit
 Thorium1 = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Thorium.Spe')
 Thorium = GaussianFit(Thorium1[0], Thorium1[1])
+
 #Thorium.Calibration(EnergyConvertion)
 #Thorium.PlotData('Thorium spectrum', 'Energy [keV]', 'Counts', 'Aquired Data')
-"""
+
 Thoriumpeak1 = Thorium.ComputeGaussian(2308, 2338)
 Thoriumpeak2 = Thorium.ComputeGaussian(2345, 2379)
 Thoriumpeak3 = Thorium.ComputeGaussian(2457, 2495)
@@ -187,7 +234,4 @@ Thoriumpeak6 = Thorium.ComputeGaussian(2938, 2975)
 Thoriumpeak7 = Thorium.ComputeGaussian(3818, 3850)
 Thorium.Calibration(EnergyConvertion, CalibrationConstant / Center)
 print(Thorium.CalibratedPeaks())
-"""
-"""
-All peaks are found and the values are stored in the variable, since it's a tuple. Multiply this by the conversion, being k.
-"""
+Thorium.PlotData("Thorium Spectrum", "Energy [keV]", "Counts")
