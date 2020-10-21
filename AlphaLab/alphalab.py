@@ -77,7 +77,7 @@ def load_spectrum(filename):
         log.error("Could not find the file '"+str(filename)+"'")
         return None
     return m.bin_centers, m.counts
-
+"""
 Amaricum80V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/Amaricium80V.Spe')
 Amercium90V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium90V.Spe')
 Amercium100V = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/AlphaLab/20201007/Amaricium100V.Spe')
@@ -93,7 +93,7 @@ ErrorAmercium90V = AmerciumValues90V[-1]
 Amercium100V1 = GaussianFit(Amercium100V[0], Amercium100V[1])
 AmerciumValues100V = Amercium100V1.ComputeGaussian(2375, 2400)
 ErrorAmercium100V = AmerciumValues100V[-1]
-
+"""
 #2388.66114752
 #Every intersection goes towards the same point.
 #Being the one listen above.
@@ -113,28 +113,37 @@ Amaricium100V3cm = load_spectrum('/Users/andreasevensen/Documents/GitHub/Fysc12/
 Americum100V1cm1 = GaussianFit(Amaricium100V1cm[0], Amaricium100V1cm[1])
 Americum100V1cm1.Calibration(EnergyConvertion, k)
 Error1 = Americum100V1cm1.ComputeGaussian(1696, 1861)
+print(Americum100V1cm1.Area, Americum100V1cm1.Mu, Americum100V1cm1.Sigma)
+print(Americum100V1cm1.Sigma/np.sqrt(Americum100V1cm1.Area))
 Alphapeak1 = Americum100V1cm1.CalibratedPeaks()
 #Americum100V1cm1.PlotData()
 Amaricium100V2cm1 = GaussianFit(Amaricium100V2cm[0], Amaricium100V2cm[1])
 Amaricium100V2cm1.Calibration(EnergyConvertion, k)
 Error2 = Amaricium100V2cm1.ComputeGaussian(1214, 1380)
+print(Amaricium100V2cm1.Area, Amaricium100V2cm1.Mu, Amaricium100V2cm1.Sigma)
+print(Amaricium100V2cm1.Sigma/np.sqrt(Amaricium100V2cm1.Area))
 Alphapeak2 = Amaricium100V2cm1.CalibratedPeaks()
 #Amaricium100V2cm1.PlotData()
 Amaricium100V2_5cm1 = GaussianFit(Amaricium100V2_5cm[0], Amaricium100V2_5cm[1])
 Amaricium100V2_5cm1.Calibration(EnergyConvertion, k)
 Error3 = Amaricium100V2_5cm1.ComputeGaussian(930, 1100)
+print(Amaricium100V2_5cm1.Area, Amaricium100V2_5cm1.Mu, Amaricium100V2_5cm1.Sigma)
+print(Amaricium100V2_5cm1.Sigma/np.sqrt(Amaricium100V2_5cm1.Area))
 Alphapeak3 = Amaricium100V2_5cm1.CalibratedPeaks()
 #Amaricium100V2_5cm1.PlotData()
 Amaricium100V3cm1 = GaussianFit(Amaricium100V3cm[0], Amaricium100V3cm[1])
 Amaricium100V3cm1.Calibration(EnergyConvertion, k)
 Error4 = Amaricium100V3cm1.ComputeGaussian(625, 795)
+print(Amaricium100V3cm1.Area, Amaricium100V3cm1.Mu, Amaricium100V3cm1.Sigma)
+print(Amaricium100V3cm1.Sigma / np.sqrt(Amaricium100V3cm1.Area))
 Alphapeak4 = Amaricium100V3cm1.CalibratedPeaks()
 #Amaricium100V3cm1.PlotData()
+print('Above is task 3')
 
 """
 Calibration curve
 """
-
+"""
 #plt.plot(Amaricium100V3cm[0], 'b')
 plt.plot(Amaricium100V3cm[0], np.array(Amaricium100V3cm[0]) *k,'g', label = "Calibration curve")
 plt.xlabel("Channel")
@@ -142,14 +151,14 @@ plt.ylabel("Energy [keV]")
 plt.title("Calibration of instruments")
 plt.legend()
 plt.show()
-
+"""
 """
 Bethe-Bloch task
 """
 R = [1.05, 1.97, 2.45, 2.93] #cm
 Ei = 5.48556 #MeV
 
-
+Alphapeaks = [4089.40728635, 2968.79159605, 2313.89393762, 1630.54133073]
 def Bethe(E_k):
     Electronpart = 0.307075 #MeVcm^2/g
     z = 2
@@ -157,7 +166,7 @@ def Bethe(E_k):
     Z = 14.46
     A = 28.96 #g/mol
     rho = 1.225*10**(-3)# g/cm3
-    I = 8.6 * 10 ** (-5)#MeV
+    I = 8.06 * 10 ** (-5)#MeV
     alphamass = 3727 #MeV
     Beta2 = 1 - 1/(1 + E_k/alphamass)**2
     Na = 6.022 * 10 ** (23)
@@ -169,7 +178,7 @@ def func1(E,r):
 
 vfunc1 = scipy.vectorize(func1)
 EnergyValues = np.array([fsolve(vfunc1, 0.5, args=(r)) for r in R]) * 10 ** (3) #Convert from Mev to keV
-MeasuredValues = np.array([Alphapeak1[0], Alphapeak2[0], Alphapeak3[0], Alphapeak4[0]])
+MeasuredValues = np.array([Alphapeaks[0], Alphapeaks[1], Alphapeaks[2], Alphapeaks[3]])
 print(EnergyValues)
 print(MeasuredValues)
 ErrorValues = np.array([Error1[1], Error2[1], Error3[1], Error4[1]])
@@ -189,7 +198,9 @@ NewMeasuredValues = np.array([Americum100V1cm1.Counts[0]/200.18, Amaricium100V2c
     Amaricium100V2_5cm1.Counts[0]/199.66,
     Amaricium100V3cm1.Counts[0]/200.08])
 
-Xlist = [Americum100V1cm1.Calibratedp()[0], Amaricium100V2cm1.Calibratedp()[0], Amaricium100V2_5cm1.Calibratedp()[0], Amaricium100V3cm1.Calibratedp()[0]]#Energy
+Xlist = [Americum100V1cm1.Calibratedp()[0], Amaricium100V2cm1.Calibratedp()[0],
+    Amaricium100V2_5cm1.Calibratedp()[0], Amaricium100V3cm1.Calibratedp()[0]]#Energy
+print(Xlist)
 
 
 plt.plot(Xlist, NewMeasuredValues, '.', label = "Data aquired")
@@ -209,13 +220,14 @@ xaxis3 = np.array(Amaricium100V2_5cm[0]) * k
 newAmericum100V3cm = np.array(Amaricium100V3cm[1]) / 200.08
 xaxis4 = np.array(Amaricium100V3cm[0]) * k
 
-plt.plot(xaxis1, newAmericum100V1cm, '.', color = 'b', label = "1cm Spectrum")
-plt.plot(xaxis2, newAmericum100V2cm, '.', color = 'r', label = "2cm Spectrum")
-plt.plot(xaxis3, newAmericum100V2_5cm, '.', color = 'g', label = "2.5cm Spectrum")
-plt.plot(xaxis4, newAmericum100V3cm, '.', color = 'black', label = "3cm Spectrum")
+plt.plot(xaxis1, newAmericum100V1cm, '-', color = 'b', label = "1cm Spectrum")
+plt.plot(xaxis2, newAmericum100V2cm, '-', color = 'r', label = "2cm Spectrum")
+plt.plot(xaxis3, newAmericum100V2_5cm, '-', color = 'g', label = "2.5cm Spectrum")
+plt.plot(xaxis4, newAmericum100V3cm, '-', color = 'black', label = "3cm Spectrum")
 plt.title("Varying distance spectrum")
 plt.xlabel("Energy [keV]")
 plt.ylabel("Counts per second")
+plt.xlim(0, 6000)
 plt.legend()
 plt.show()
 #Calibration done for the newly imported files
